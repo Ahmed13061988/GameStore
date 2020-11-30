@@ -8,13 +8,14 @@ class UsersController < ApplicationController
       end 
   
       def create
-          user = User.new(user_params)
-          if user.save
-              render json: user, except: [:created_at, :updated_at]
-          else
-              render json: {message: "Signup Failed"}
-          end
-      end
+        user = User.new(user_params)
+        if user.save
+            token = encode_token(user.id)
+            render json: { user: UserSerializer.new(user), token: token }
+        else
+            render json: { errors: user.errors.full_messages.to_sentence} 
+        end
+    end
   
       def show
           user = User.find_by(id: params[:id])
